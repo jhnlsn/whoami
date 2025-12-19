@@ -207,3 +207,43 @@ jobs:
             ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    name: Deploy to Raspberry Pi
+    runs-on: [self-hosted, linux, ARM64]
+    needs: [build, docker]
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download ARM64 binary from release
+        run: |
+          wget -q https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/whoami-linux-aarch64 \
+            -O /tmp/whoami-new
+          chmod +x /tmp/whoami-new
+
+      - name: Verify binary
+        run: |
+          file /tmp/whoami-new
+          ldd /tmp/whoami-new || echo "Static binary (expected)"
+
+      - name: Deploy binary
+        run: |
+          mkdir -p ~/whoami/bin
+          cp /tmp/whoami-new ~/whoami/bin/whoami
+          chmod +x ~/whoami/bin/whoami
+
+      - name: Restart service
+        run: |
+          systemctl --user restart whoami.service
+
+      - name: Wait for service to start
+        run: sleep 3
+
+      - name: Check service status and health
+        run: |
+          systemctl --user status whoami.service
+          curl -f http://localhost:8080/health || exit 1
+
+      - name: Cleanup
+        if: always()
+        run: rm -f /tmp/whoami-new

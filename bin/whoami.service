@@ -1,0 +1,22 @@
+[Unit]
+Description=WhoAmI HTTP Service
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/whoami
+ExecStart=%h/whoami/bin/whoami
+Restart=always
+RestartSec=5
+Environment="PORT=3000"
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
