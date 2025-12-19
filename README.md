@@ -110,7 +110,11 @@ chmod +x whoami-macos-x86_64
 
 **Using GitHub Container Registry:**
 ```bash
+# Default port (3000)
 docker run -p 3000:3000 ghcr.io/jhnlsn/whoami:latest
+
+# Custom port (8080)
+docker run -p 8080:8080 -e PORT=8080 ghcr.io/jhnlsn/whoami:latest
 ```
 
 **Build locally:**
@@ -119,10 +123,13 @@ docker run -p 3000:3000 ghcr.io/jhnlsn/whoami:latest
 # Build the image
 docker build -t whoami:latest .
 
-# Run the container
+# Run the container (default port)
 docker run -p 3000:3000 whoami:latest
 
-# Visit http://localhost:3000
+# Run with custom port
+docker run -p 8080:8080 -e PORT=8080 whoami:latest
+
+# Visit http://localhost:3000 (or your custom port)
 ```
 
 ### Build from Source

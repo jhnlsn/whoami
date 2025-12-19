@@ -196,9 +196,14 @@ jobs:
             - `linux/amd64` (x86_64)
             - `linux/arm64` (ARM64/Apple Silicon)
 
-            **Run:**
+            **Run (default port 3000):**
             ```bash
             docker run -p 3000:3000 ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ```
+
+            **Run (custom port):**
+            ```bash
+            docker run -p 8080:8080 -e PORT=8080 ghcr.io/${{ github.repository }}:${{ github.ref_name }}
             ```
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

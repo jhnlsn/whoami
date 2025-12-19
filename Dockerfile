@@ -28,7 +28,10 @@ FROM scratch
 # Copy the binary from builder
 COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/whoami /whoami
 
-# Expose port
+# Set default port (can be overridden with -e PORT=8080)
+ENV PORT=3000
+
+# Expose default port (documentation only)
 EXPOSE 3000
 
 # Run the binary
