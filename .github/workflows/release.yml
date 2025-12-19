@@ -92,17 +92,22 @@ jobs:
         run: |
           strip target/${{ matrix.target }}/release/${{ matrix.artifact_name }} || true
 
+      - name: Prepare release asset
+        run: |
+          mkdir -p release
+          cp target/${{ matrix.target }}/release/${{ matrix.artifact_name }} release/${{ matrix.asset_name }}
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
-          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          path: release/${{ matrix.asset_name }}
 
       - name: Create release and upload assets
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          files: release/${{ matrix.asset_name }}
           name: ${{ github.ref_name }}
           draft: false
           prerelease: false
