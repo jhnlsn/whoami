@@ -175,3 +175,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Update release with Docker info
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          append_body: true
+          body: |
+
+            ## 🐳 Docker Images
+
+            Multi-platform Docker images are available on GitHub Container Registry:
+
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            docker pull ghcr.io/${{ github.repository }}:latest
+            ```
+
+            **Supported platforms:**
+            - `linux/amd64` (x86_64)
+            - `linux/arm64` (ARM64/Apple Silicon)
+
+            **Run:**
+            ```bash
+            docker run -p 3000:3000 ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ```
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
