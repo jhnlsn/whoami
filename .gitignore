@@ -1,5 +1,7 @@
 # Rust
 /target/
+/binaries/
+/release/
 
 # IDE
 .idea/

@@ -1,0 +1,15 @@
+# Runtime-only Dockerfile for pre-built binaries
+# Used by GitHub Actions to create multi-platform images from already-built binaries
+FROM scratch
+
+# TARGETARCH is automatically set by buildx to 'amd64' or 'arm64'
+ARG TARGETARCH
+
+# Copy the pre-built binary for the target architecture
+COPY binaries/${TARGETARCH}/whoami-linux-* /whoami
+
+# Expose port
+EXPOSE 3000
+
+# Run the binary
+ENTRYPOINT ["/whoami"]

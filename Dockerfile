@@ -1,3 +1,7 @@
+# Build-from-source Dockerfile
+# Use this for local development and builds
+# GitHub Actions uses Dockerfile.runtime with pre-built binaries for faster CI/CD
+
 # Stage 1: Build
 FROM rust:1.83-alpine AS builder
 

@@ -125,6 +125,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Download Linux AMD64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: whoami-linux-x86_64
+          path: ./binaries/amd64
+
+      - name: Download Linux ARM64 binary
+        uses: actions/download-artifact@v4
+        with:
+          name: whoami-linux-aarch64
+          path: ./binaries/arm64
+
+      - name: Make binaries executable
+        run: |
+          chmod +x ./binaries/amd64/whoami-linux-x86_64
+          chmod +x ./binaries/arm64/whoami-linux-aarch64
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -151,6 +168,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.runtime
           platforms: linux/amd64,linux/arm64
           push: ${{ startsWith(github.ref, 'refs/tags/') }}
           tags: ${{ steps.meta.outputs.tags }}

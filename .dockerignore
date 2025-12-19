@@ -1,4 +1,6 @@
 target/
+binaries/
+release/
 .git/
 .github/
 .gitignore
@@ -6,3 +8,4 @@ target/
 .claude/
 .dockerignore
 Dockerfile
+Dockerfile.runtime
