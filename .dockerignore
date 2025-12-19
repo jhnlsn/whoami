@@ -1,6 +1,4 @@
 target/
-binaries/
-release/
 .git/
 .github/
 .gitignore
