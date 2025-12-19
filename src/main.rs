@@ -233,11 +233,7 @@ async fn serve_json(
         .status(StatusCode::OK)
         .header("content-type", "application/json")
         .header("access-control-allow-origin", "*")
-        .body(
-            Full::new(Bytes::from(json))
-                .map_err(|e| match e {})
-                .boxed(),
-        )
+        .body(Full::new(Bytes::from(json)).map_err(|e| match e {}).boxed())
         .unwrap();
 
     Ok(response)
@@ -263,11 +259,7 @@ async fn serve_text(
     let response = Response::builder()
         .status(StatusCode::OK)
         .header("content-type", "text/plain; charset=utf-8")
-        .body(
-            Full::new(Bytes::from(text))
-                .map_err(|e| match e {})
-                .boxed(),
-        )
+        .body(Full::new(Bytes::from(text)).map_err(|e| match e {}).boxed())
         .unwrap();
 
     Ok(response)
@@ -300,11 +292,7 @@ async fn serve_html(
     let response = Response::builder()
         .status(StatusCode::OK)
         .header("content-type", "text/html; charset=utf-8")
-        .body(
-            Full::new(Bytes::from(html))
-                .map_err(|e| match e {})
-                .boxed(),
-        )
+        .body(Full::new(Bytes::from(html)).map_err(|e| match e {}).boxed())
         .unwrap();
 
     Ok(response)
@@ -315,11 +303,7 @@ async fn serve_health() -> Result<Response<BoxBody>, Infallible> {
     let response = Response::builder()
         .status(StatusCode::OK)
         .header("content-type", "text/plain")
-        .body(
-            Full::new(Bytes::from("OK"))
-                .map_err(|e| match e {})
-                .boxed(),
-        )
+        .body(Full::new(Bytes::from("OK")).map_err(|e| match e {}).boxed())
         .unwrap();
 
     Ok(response)
@@ -392,10 +376,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         tokio::spawn(async move {
             if let Err(err) = http1::Builder::new()
-                .serve_connection(
-                    io,
-                    service_fn(move |req| handle_request(req, peer_addr)),
-                )
+                .serve_connection(io, service_fn(move |req| handle_request(req, peer_addr)))
                 .await
             {
                 eprintln!("Error serving connection: {:?}", err);
