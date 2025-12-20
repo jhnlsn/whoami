@@ -25,23 +25,24 @@ curl http://localhost:3000/
 ```
 
 ### `GET /json` or `GET /api` - JSON API
-Returns connection information as JSON.
+Returns IP address as JSON. Use `?full=true` for detailed information.
 
+**Simple response (default):**
 ```bash
 curl http://localhost:3000/json
 ```
 
-**Response:**
 ```json
-{
-  "ip": "127.0.0.1",
-  "user_agent": "curl/7.64.1",
-  "headers": {
-    "host": "localhost:3000",
-    "user-agent": "curl/7.64.1",
-    "accept": "*/*"
-  }
-}
+{"ip":"127.0.0.1"}
+```
+
+**Full response (with query parameter):**
+```bash
+curl http://localhost:3000/json?full=true
+```
+
+```json
+{"ip":"127.0.0.1","user_agent":"curl/7.64.1","headers":{"host":"localhost:3000","user-agent":"curl/7.64.1","accept":"*/*"}}
 ```
 
 ### `GET /text` - Plain Text

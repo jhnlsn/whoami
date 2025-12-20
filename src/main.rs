@@ -20,6 +20,12 @@ struct WhoAmIResponse {
     headers: HashMap<String, String>,
 }
 
+// Simple IP-only response
+#[derive(Serialize, Deserialize)]
+struct SimpleResponse {
+    ip: String,
+}
+
 // HTML template
 const HTML_TEMPLATE: &str = r#"<!DOCTYPE html>
 <html lang="en">
@@ -35,7 +41,7 @@ const HTML_TEMPLATE: &str = r#"<!DOCTYPE html>
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: black;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -218,16 +224,26 @@ async fn serve_json(
     peer_addr: SocketAddr,
 ) -> Result<Response<BoxBody>, Infallible> {
     let ip = extract_client_ip(&req, peer_addr);
-    let user_agent = extract_user_agent(&req);
-    let headers = collect_headers(&req);
 
-    let response = WhoAmIResponse {
-        ip,
-        user_agent,
-        headers,
+    // Check if full output is requested via query parameter
+    let query = req.uri().query().unwrap_or("");
+    let full_output = query.contains("full=true") || query.contains("full=1");
+
+    let json = if full_output {
+        let user_agent = extract_user_agent(&req);
+        let headers = collect_headers(&req);
+
+        let response = WhoAmIResponse {
+            ip,
+            user_agent,
+            headers,
+        };
+
+        serde_json::to_string(&response).unwrap_or_else(|_| "{}".to_string())
+    } else {
+        let response = SimpleResponse { ip };
+        serde_json::to_string(&response).unwrap_or_else(|_| "{}".to_string())
     };
-
-    let json = serde_json::to_string_pretty(&response).unwrap_or_else(|_| "{}".to_string());
 
     let response = Response::builder()
         .status(StatusCode::OK)
@@ -364,11 +380,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = TcpListener::bind(addr).await?;
     println!("🚀 WhoAmI server listening on http://{}", addr);
     println!("📍 Endpoints:");
-    println!("   GET /       - HTML page");
-    println!("   GET /json   - JSON API");
-    println!("   GET /api    - JSON API (alias)");
-    println!("   GET /text   - Plain text");
-    println!("   GET /health - Health check");
+    println!("   GET /              - HTML page");
+    println!("   GET /json          - JSON API (IP only)");
+    println!("   GET /json?full=true - JSON API (full details)");
+    println!("   GET /api           - JSON API (alias)");
+    println!("   GET /text          - Plain text");
+    println!("   GET /health        - Health check");
 
     loop {
         let (stream, peer_addr) = listener.accept().await?;
