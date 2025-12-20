@@ -228,9 +228,10 @@ jobs:
 
       - name: Deploy binary
         run: |
-          sudo cp /tmp/whoami-new /opt/whoami/bin/whoami
-          sudo chmod +x /opt/whoami/bin/whoami
-          sudo chown whoami:whoami /opt/whoami/bin/whoami
+          sudo cp /tmp/whoami-new /opt/whoami/bin/whoami.new
+          sudo chmod +x /opt/whoami/bin/whoami.new
+          sudo chown whoami:whoami /opt/whoami/bin/whoami.new
+          sudo mv /opt/whoami/bin/whoami.new /opt/whoami/bin/whoami
 
       - name: Restart service
         run: |
