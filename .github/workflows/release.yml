@@ -228,20 +228,20 @@ jobs:
 
       - name: Deploy binary
         run: |
-          mkdir -p ~/whoami/bin
-          cp /tmp/whoami-new ~/whoami/bin/whoami
-          chmod +x ~/whoami/bin/whoami
+          sudo cp /tmp/whoami-new /opt/whoami/bin/whoami
+          sudo chmod +x /opt/whoami/bin/whoami
+          sudo chown whoami:whoami /opt/whoami/bin/whoami
 
       - name: Restart service
         run: |
-          systemctl --user restart whoami.service
+          sudo systemctl restart whoami.service
 
       - name: Wait for service to start
         run: sleep 3
 
       - name: Check service status and health
         run: |
-          systemctl --user status whoami.service
+          sudo systemctl status whoami.service
           curl -f http://localhost:8080/health || exit 1
 
       - name: Cleanup
