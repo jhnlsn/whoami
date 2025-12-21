@@ -1,3 +1,4 @@
+use chrono::Local;
 use http_body_util::{BodyExt, Full};
 use hyper::body::{Bytes, Incoming};
 use hyper::server::conn::http1;
@@ -354,14 +355,40 @@ async fn handle_request(
     req: Request<Incoming>,
     peer_addr: SocketAddr,
 ) -> Result<Response<BoxBody>, Infallible> {
-    match (req.method(), req.uri().path()) {
+    // Extract data for logging before moving req
+    let method = req.method().clone();
+    let uri = req.uri().clone();
+    let user_agent = req
+        .headers()
+        .get("user-agent")
+        .and_then(|ua| ua.to_str().ok())
+        .unwrap_or("-")
+        .to_string();
+    let client_ip = extract_client_ip(&req, peer_addr);
+
+    let response = match (req.method(), req.uri().path()) {
         (&Method::GET, "/") => serve_html(req, peer_addr).await,
         (&Method::GET, "/json") => serve_json(req, peer_addr).await,
         (&Method::GET, "/api") => serve_json(req, peer_addr).await,
         (&Method::GET, "/text") => serve_text(req, peer_addr).await,
         (&Method::GET, "/health") => serve_health().await,
         _ => serve_404().await,
-    }
+    };
+
+    // Log access in Combined Log Format style
+    let status = response.as_ref().ok().map(|r| r.status().as_u16()).unwrap_or(500);
+    let now = Local::now();
+    println!(
+        "{} - - [{}] \"{} {} HTTP/1.1\" {} - \"{}\"",
+        client_ip,
+        now.format("%d/%b/%Y:%H:%M:%S %z"),
+        method,
+        uri,
+        status,
+        user_agent
+    );
+
+    response
 }
 
 // Get port from environment variable or use default
